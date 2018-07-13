@@ -118,6 +118,13 @@ export default Controller.extend({
             const puppeteer = window.requireNode('puppeteer');
             this.set('loading', true);
 
+            // Read in a json file for testing...
+            let fs = window.requireNode('fs');
+            let path = window.requireNode('path');
+            // var contents = fs.readFileSync(path.resolve('posts')+'/'+result.post_file);
+            let contents = fs.readFileSync(path.resolve() + '/ember-electron/resources/post.json');
+            contents = JSON.parse(contents);
+
             (async () => {
                 const browser = await puppeteer.launch({ headless: false });
                 const pages = await browser.pages();
