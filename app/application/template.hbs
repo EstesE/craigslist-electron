@@ -1,0 +1,25 @@
+{{my-select model=model navigate=(action 'navigate') test=(action 'test')}}
+
+{{!-- {{#if location}}
+    {{i-frame loading=loading location=location listChanges=(action 'listChanges')}}
+{{/if}} --}}
+
+{{#if loading}}
+    {{loading-mask loadingMessage=loadingMessage}}
+{{/if}}
+{{#if ourChanges}}
+    {{!-- {{{ourChanges.action}}}
+    {{{ourChanges.cryptedStepCheck}}} --}}
+    <div class="container">
+        {{#if myAction}}
+        <form action={{myAction}} method="POST">
+        {{#each ourChanges as |element|}}
+            {{element}}
+        {{/each}}
+        </form>
+        {{/if}}
+    </div>
+{{/if}}
+
+
+{{outlet}}
