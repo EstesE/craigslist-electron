@@ -3,22 +3,22 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Component | i-frame', function(hooks) {
+module('Integration | Component | image-picker', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
     // Set any properties with this.set('myProperty', 'value');
     // Handle any actions with this.set('myAction', function(val) { ... });
 
-    await render(hbs`{{i-frame}}`);
+    await render(hbs`{{image-picker}}`);
 
     assert.equal(this.element.textContent.trim(), '');
 
     // Template block usage:
     await render(hbs`
-      {{#i-frame}}
+      {{#image-picker}}
         template block text
-      {{/i-frame}}
+      {{/image-picker}}
     `);
 
     assert.equal(this.element.textContent.trim(), 'template block text');

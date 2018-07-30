@@ -7,7 +7,17 @@ const async = require('async');
 
 // Array of files to download
 let testData = [
-    
+    'https://files.kde.org/neon/images/neon-useredition/current/neon-useredition-20180723-1347-amd64.iso',
+    'https://somethingsquare.blob.core.windows.net/something-web/optimized.jpeg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/texas/texas.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/arizona/arizona.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/michigan/michigan.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/nevada/nevada.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/mississippi/mississippi.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/massachusetts/massachusetts.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/florida/florida.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/south-carolina/south-carolina.jpg',
+    'https://somethingsquare.blob.core.windows.net/something-web/properties/north-carolina/north-carolina.jpg'
 ];
 
 
@@ -90,7 +100,7 @@ let downloader = function (file, callback) {
 
 let q = async.queue(function (task, callback) {
     downloader(task, callback);
-}, 1);
+}, 5);
 
 q.drain = function() {
     console.log('Finished downloading...');

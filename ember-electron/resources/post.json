@@ -1,14 +1,15 @@
 {
     "email": "",
     "password": "",
-    "PostingTitle": "Apartment for Rent #09",
+    "PostingTitle": "Apartment for Rent #",
+    "postNumber": 0,
     "GeographicArea": "1007 Cadillac Ct, Fairbanks, AK",
     "postal_code": "99701",
-    "PostingBody": "Apaftment for rent!",
+    "PostingBody": "<h1>Apartments for rent!</h1><ul><li>Amenity 01</li><li>Amenity 02</li></ul><br>",
     "Sqft": "90",
-    "price": "5000",
+    "price": "5003",
     "contact_phone": "(907) 479-8377",
-    "contact_name": "Jenny Jones",
+    "contact_name": "Jennifer Jones",
     "imgs": []
   }
   

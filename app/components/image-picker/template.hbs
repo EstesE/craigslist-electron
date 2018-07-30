@@ -1,0 +1,61 @@
+<div class="container p-b">
+    <div class="row">
+
+        <div class="col-xs-12">
+            <div class="col-xs-6">
+                <h2 class="block-title m-b-sm m-t-sm text-uppercase text-ellipsis">Select Images</h2>
+            </div>
+            <div class="col-xs-6">
+                <div class="btn-groupx pull-rightx" style="margin-top: 22px; margin-bottom: 11px;">
+                {{#each model as |image|}}
+                    <div {{action addAnImage image.src this}} class='col-md-12 p-x-0'>{{image.title}}
+                        <img src={{concat blobBaseUrl blobContainer image.src}} style="width: 97%; margin-bottom: 5px; margin-left: 5px;" class="thumbnail" />
+                        <div class="text-center" style="font-size: 0.7em;">{{get-filename image.src}}</div>
+                    </div>
+                {{/each}}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+        
+        {{#sortable-objects sortableObjectList=property.gallery sortEndAction='dragEnd' enableSort=true useSwap=false sortingScope="sortingGroup"}}
+            {{#each property.gallery as |item|}}
+                X{{item}}X
+            <div class="col-xs-6 col-sm-3 draggable-img">
+                {{#draggable-object content=item isSortable=true sortingScope="sortingGroup"}}
+                    {{item.title}}
+                    <a href="#" class="delete-image"  style="position: absolute; top: 27px; right: 22px;" {{action 'imgClick' item}}>
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        Delete
+                    </a>
+                    <img src="{{concat blobBaseUrl blobContainer item.src}}" class="thumbnail img-responsive m-b-0 w-full {{if item.active 'opacity-100' 'opacity-20'}}"/>
+                    <div class="gallery-overlay-name text-center">{{get-filename item.src}}</div>
+                    
+                    <div class='w-full'>
+                        <div class="form-group" style="margin-bottom: 5px">
+                            <label for="title">Title:</label>
+                            {{input type="text" class="form-control gallery-title" name="title" placeholder="Image Title" value=item.title}}
+                            {{input type="hidden" class='position' value=item.meta.position}}
+                        </div>
+                        <div class="form-group" style="margin-bottom: 5px">
+                            <label for="description">Description:</label>
+                            {{textarea class="form-control" rows="2" style="margin-bottom: 10px;" value=item.description}}
+                        </div>
+                    </div>
+                {{/draggable-object}}
+            </div>
+            {{/each}}
+        {{/sortable-objects}}
+
+        </div>
+
+        <div class="col-md-12">
+            <div class="pull-right m-t-20">
+                <button type="button" class="btn btn-primary-outline m-r" {{action 'onClose'}}>Cancel</button>
+                <button type="submit" class="btn btn-primary-outline pull-right" {{action onSave}}>Save</button>
+            </div>
+        </div>
+
+    </div>
+</div>

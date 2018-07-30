@@ -6,6 +6,9 @@ const Router = EmberRouter.extend({
   rootURL: config.rootURL
 });
 
-Router.map(function() {});
+Router.map(function() {
+  this.route('finished', { path: '/:name' });
+  this.route('catch-all', { path: '/*path' });
+});
 
 export default Router;

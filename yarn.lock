@@ -3948,6 +3948,12 @@ ember-decorators@^2.0.0-beta.2:
     ember-cli-babel "^6.0.0"
     semver "^5.5.0"
 
+ember-drag-drop@^0.4.8:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/ember-drag-drop/-/ember-drag-drop-0.4.8.tgz#59d0d89c30068abd3edcdec47f84edd26fa8ef02"
+  dependencies:
+    ember-cli-babel "^6.6.0"
+
 ember-electron@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/ember-electron/-/ember-electron-2.8.0.tgz#a90fc9707f71a7c551eca880a804e0a570f20979"
@@ -4164,6 +4170,14 @@ ember-text-measurer@^0.4.0:
   resolved "https://registry.yarnpkg.com/ember-text-measurer/-/ember-text-measurer-0.4.1.tgz#30ababa7100b2ffb86f8c37fe2b4b56d2592c626"
   dependencies:
     ember-cli-babel "^6.8.2"
+
+ember-toastr@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/ember-toastr/-/ember-toastr-1.7.2.tgz#8b060b01821dd4e94b9da3aa5eab5375753ceba4"
+  dependencies:
+    broccoli-funnel "^2.0.1"
+    broccoli-merge-trees "^2.0.0"
+    ember-cli-babel "^6.11.0"
 
 ember-truth-helpers@^2.0.0:
   version "2.0.0"
@@ -4529,6 +4543,12 @@ esutils@^2.0.0, esutils@^2.0.2:
 etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
+
+eval@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/eval/-/eval-0.1.2.tgz#9f7103284c105a66df4030b2b3273165837013da"
+  dependencies:
+    require-like ">= 0.1.1"
 
 eventemitter3@^3.0.0:
   version "3.1.0"
@@ -6314,7 +6334,7 @@ jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
 
-jquery@^3.3.1:
+jquery@>=1.12.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -8413,9 +8433,9 @@ punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-puppeteer@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-1.5.0.tgz#e35db3f3ba3d41013feb65be02bdaa727ec7b8ec"
+puppeteer@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-1.6.1.tgz#ae50021bf8b2172be8f8d79224bec215f1a0c7c7"
   dependencies:
     debug "^3.1.0"
     extract-zip "^1.6.6"
@@ -8841,6 +8861,10 @@ request@2.87.0, request@^2.45.0, request@^2.55.0, request@^2.79.0, request@^2.87
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
+
+"require-like@>= 0.1.1":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/require-like/-/require-like-0.1.2.tgz#ad6f30c13becd797010c468afa775c0c0a6b47fa"
 
 require-main-filename@^1.0.1:
   version "1.0.1"
@@ -10047,6 +10071,12 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     extend-shallow "^3.0.2"
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
+
+toastr@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/toastr/-/toastr-2.1.4.tgz#8b43be64fb9d0c414871446f2db8e8ca4e95f181"
+  dependencies:
+    jquery ">=1.12.0"
 
 touch@0.0.3:
   version "0.0.3"

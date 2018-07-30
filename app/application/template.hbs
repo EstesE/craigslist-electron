@@ -1,16 +1,12 @@
-{{my-select model=model navigate=(action 'navigate') test=(action 'test')}}
-
-{{!-- {{#if location}}
-    {{i-frame loading=loading location=location listChanges=(action 'listChanges')}}
-{{/if}} --}}
+{{!-- {{my-select model=model navigate=(action 'navigate') test=(action 'test')}}
 
 {{#if loading}}
     {{loading-mask loadingMessage=loadingMessage}}
-{{/if}}
-{{#if ourChanges}}
+{{/if}} --}}
+{{!-- {{#if ourChanges}} --}}
     {{!-- {{{ourChanges.action}}}
     {{{ourChanges.cryptedStepCheck}}} --}}
-    <div class="container">
+    {{!-- <div class="container">
         {{#if myAction}}
         <form action={{myAction}} method="POST">
         {{#each ourChanges as |element|}}
@@ -18,8 +14,12 @@
         {{/each}}
         </form>
         {{/if}}
-    </div>
-{{/if}}
+    </div> --}}
+{{!-- {{/if}} --}}
+
+{{!-- {{#if showImagePicker}}
+    {{image-picker model=model.property.gallery onClose=close onSave=(action 'onSave') addAnImage=(action 'addAnImage')}}
+{{/if}} --}}
 
 
 {{outlet}}

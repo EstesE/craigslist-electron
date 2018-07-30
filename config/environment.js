@@ -15,6 +15,13 @@ module.exports = function(environment) {
       
     },
 
+    asset: {
+      
+    },
+
+    // Path to save downloaded images to.
+    path: './ember-electron/resources/downloads/',
+
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

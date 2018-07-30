@@ -1,0 +1,18 @@
+{{#unless loading}}
+<div class="container">
+    <label>Select Area</label>
+    {{my-select model=model navigate=(action 'navigate') test=(action 'test')}} 
+</div>
+{{/unless}}
+
+{{#if loading}}
+    {{loading-mask loadingMessage=loadingMessage}}
+{{/if}}
+
+{{#unless loading}}
+    {{#if showImagePicker}}
+        {{image-picker model=model.property.gallery onSave=(action 'onSave') addAnImage=(action 'addAnImage')}}
+    {{/if}}
+{{/unless}}
+
+{{outlet}}
