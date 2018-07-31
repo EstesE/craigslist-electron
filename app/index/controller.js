@@ -64,6 +64,8 @@ export default Controller.extend({
 
         addAnImage(image, controller) {
             console.log(`Add image (${++this.imgCount}): ${image}`); // eslint-disable-line no-console
+
+            // Add image to array
             this.imagesToDownload.push(image);
 
             const https = window.requireNode('https');
@@ -175,15 +177,15 @@ export default Controller.extend({
                 let x = async function (files, page, folder, browser) {
                     // TODO: Add a config entry to determine how many times to attempt to upload an image.
                     let uploadImage = async function(file, page, folder, browser, c) {
-                        console.log(`Attempt (${c}) to upload - ${file} (${++controller.uploadCount})`); // eslint-disable-line no-console
+                        console.log(`Attempt (${++c}) to upload - ${file} (${++controller.uploadCount})`); // eslint-disable-line no-console
                         let myError = null;
                         let input = '';
                         try {
+                            await page.waitForSelector('input[name="file"]');
                             input = await page.$('input[name="file"]', { waitUntil: 'networkidle2' }, ).catch(err => {
                                 // console.log(err);
                                 myError = err;
                             });
-                            await page.waitFor(1000);
                             try {
                                 await input.uploadFile(folder + file);
                             } catch (e) {
@@ -198,9 +200,8 @@ export default Controller.extend({
                             myError = e;
                         }
                         if (isPresent(myError)) {
-                            await uploadImage(file, page, folder, browser, c + 1);
+                            await uploadImage(file, page, folder, browser, c);
                         }
-                        await page.waitFor(500);
                     };
                     
                     for (let i = 0; i < files.length; i++) {
@@ -212,9 +213,9 @@ export default Controller.extend({
 
                         if (i === files.length - 1) {
                             controller.set('loadingMessage', 'Finishing up posting process...');
-                            await page.waitFor(1500);
+                            await page.waitForSelector(".bigbutton");
                             await page.click(".bigbutton");
-                            await page.waitFor(1500);
+                            await page.waitForSelector('button[value="Continue"]');
                             await page.click('button[value="Continue"]');
 
                             controller.set('loadingMessage', 'Finalizing...');
@@ -245,6 +246,7 @@ export default Controller.extend({
 
             (async () => {
                 let amenities = controller.getAmenities(controller.model.property);
+                let junk = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum sed arcu non odio. Ipsum consequat nisl vel pretium lectus. Sagittis vitae et leo duis. Sit amet nulla facilisi morbi tempus iaculis. Nisi est sit amet facilisis magna etiam. Aenean vel elit scelerisque mauris. Proin nibh nisl condimentum id venenatis a condimentum. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. Interdum posuere lorem ipsum dolor sit amet consectetur.</p><p>Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Sit amet aliquam id diam maecenas ultricies mi. Id venenatis a condimentum vitae. Habitant morbi tristique senectus et. Pellentesque elit ullamcorper dignissim cras. Malesuada proin libero nunc consequat interdum. Urna porttitor rhoncus dolor purus non. Feugiat in ante metus dictum at tempor. Faucibus purus in massa tempor nec feugiat nisl pretium. Nibh tellus molestie nunc non blandit massa enim nec dui. Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Pellentesque adipiscing commodo elit at imperdiet. Consequat semper viverra nam libero justo laoreet sit.</p>"
 
                 const browser = await puppeteer.launch({ headless: false });
                 const pages = await browser.pages();
@@ -260,56 +262,56 @@ export default Controller.extend({
                     browser.close();
                 });
 
-                // // Add JQuery
-                // controller.set('loadingMessage', 'Injecting the Query of J\'s');
-                // await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
-                // const title = await page.evaluate(() => {
-                //     const $ = window.$; //otherwise the transpiler will rename it and won't work
-                //     const jQuery = $;
-                //     return $('h1 > span').text();
-                // });
-
-                // Type into search box.
-                // await page.type('input#inputEmailHandle', config.craigslist.emailHandle);
+                // Login
                 await page.$eval('input#inputEmailHandle', (el, value) => el.value = value, config.craigslist.emailHandle);
-                await page.waitFor(250);
-                // await page.type('input#inputPassword', config.craigslist.password);
                 await page.$eval('input#inputPassword', (el, value) => el.value = value, config.craigslist.password);
-                await page.waitFor(250);
                 await page.click('button.accountform-btn');
 
+                // Redirect to the apartments page
                 await page.waitFor(2000);
                 controller.set('loadingMessage', 'Redirecting...');
-                await page.goto(`https://${location.hostname}.craigslist.org/d/apts-housing-for-rent/search/apa`, { waitUntil: 'networkidle2' });
+                try {
+                    await page.goto(`https://${location.hostname}.craigslist.org/d/apts-housing-for-rent/search/apa`, { waitUntil: 'networkidle2' });
+                } catch(e) {
+                    console.error(e); // eslint-disable-line no-console
+                    browser.close();
+                }
 
-                // Wait for the results page to load and display the results.
-                let resultsSelector = '.post';
-                await page.waitForSelector(resultsSelector);
-
-                // Extract the results from the page.
+                // Extract the results from the page and navigate
                 const links = await page.evaluate(el => el.innerHTML, await page.$('.post'));
                 controller.set('loadingMessage', 'Navigating...');
-                await page.goto($(links.trim())[0].href, { awaitUntil: 'networkidle2' });
+                try {
+                    await page.goto($(links.trim())[0].href, { awaitUntil: 'networkidle2' });
+                } catch(e) {
+                    console.error(e); // eslint-disable-line no-console
+                    browser.close();
+                }
 
-                // // Get crypted value from form
-                // let crypted = await page.evaluate(() => {
-                //     return document.querySelector('input[name="cryptedStepCheck"]').value;
-                // });
-
-                // // Get form action
-                // let action = await page.evaluate(() => {
-                //     return document.querySelector('form').action;
-                // });
-
-                // Navigate
-                await page.waitFor(1000);
+                // More navigation
+                // await page.waitFor(1000);
+                try {
+                    await page.waitForSelector('input[value="ho"]', { timeout: 5000 });
+                } catch(e) {
+                    let notifications = controller.get('notifications');
+                    notifications.error(e, 'Error', { progressBar: false, timeOut: 10000 });
+                    browser.close();
+                    // TODO: Handle places like Hawaii that need additional navigation
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 10000);
+                }
                 await page.evaluate(() => {
                     document.querySelector('input[value="ho"]').click();
                     document.querySelector('button[value="Continue"]').click();
                 });
 
                 await page.waitFor(1000);
-                await page.goto(page._target._targetInfo.url.replace('type', 'hcat'), { awaitUntil: 'networkidle2' });
+                try {
+                    await page.goto(page._target._targetInfo.url.replace('type', 'hcat'), { awaitUntil: 'networkidle2' });
+                } catch(e) {
+                    console.error(e); // eslint-disable-line no-console
+                    browser.close();
+                }
 
                 // More navigation
                 await page.waitFor(500);
@@ -318,43 +320,32 @@ export default Controller.extend({
                     document.querySelector('button[value="Continue"]').click();
                 });
 
-                // Main page to populate
+                // Populate form
                 controller.set('loadingMessage', 'Populating form...');
-                await page.waitFor(500);
-                // await page.type('#PostingTitle', contents.PostingTitle + contents.postNumber);
+                await page.waitForSelector('#PostingTitle');
                 await page.$eval('#PostingTitle', (el, value) => el.value = value, contents.PostingTitle + contents.postNumber);
-                // await page.type('#GeographicArea', contents.GeographicArea);
                 await page.$eval('#GeographicArea', (el, value) => el.value = value, `${controller.model.property.address.street}, ${controller.model.property.address.city}, ${controller.model.property.address.state.abbreviation}`);
-                // await page.type('#postal_code', contents.postal_code);
-                // await page.$eval('#postal_code', (el, value) => el.value = value, contents.postal_code);
                 await page.$eval('#postal_code', (el, value) => el.value = value, controller.model.property.address.zip);
-
-                // await page.type('#PostingBody', contents.PostingBody + amenities);
-                await page.$eval('#PostingBody', (el, value) => el.value = value, contents.PostingBody + amenities);
-                // await page.type("input[name='price']", contents.price);
+                await page.$eval('#PostingBody', (el, value) => el.value = value, contents.PostingBody + junk + amenities);
                 await page.$eval("input[name='price']", (el, value) => el.value = value, contents.price);
-                await page.waitFor(500);
                 await page.click("input[name='pets_cat']");
                 await page.click("input[name='pets_dog']");
                 await page.click("input[value='A']");
-                // await page.type("input[name='contact_name']", contents.contact_name);
                 await page.$eval("input[name='contact_name']", (el, value) => el.value = value, contents.contact_name);
-                // await page.type("input[name='contact_phone']", contents.contact_phone);
                 await page.$eval("input[name='contact_phone']", (el, value) => el.value = value, contents.contact_phone);
-                await page.waitFor(500);
-
                 await page.click("button[name='go']");
 
                 // Cross street page
-                await page.waitFor(2000);
+                await page.waitForSelector('.continue');
                 await page.click('.continue');
 
                 // Images page
                 controller.set('loadingMessage', 'Getting images ready...');
-                await page.waitFor(2000);
+                await page.waitForSelector('#classic');
                 await page.click('#classic');
-                await page.waitFor(2000);
+                await page.waitForSelector("input[name='file']");
 
+                // Images section
                 await this.showImages(controller);
             })();
         }
