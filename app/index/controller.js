@@ -18,6 +18,9 @@ export default Controller.extend({
     imagesToDownload: A(new Array()),
     loadingMessage: 'Loading...',
     page: null,
+    imgCount: 0,
+    addImageCount: 0,
+    uploadCount: 0,
 
     message: async function (title, message, controller) {
         let notifications = controller.get('notifications');
@@ -28,7 +31,25 @@ export default Controller.extend({
         controller.transitionToRoute('finished', controller.model.property.name);
     },
 
+    getAmenities: function(property) {
+        let amenityString = '';
+        if (isPresent(property)) {
+            for(let i = 0; i < property.amenities.categories.length; i++) {
+                amenityString += `<h4>${property.amenities.categories[i].name}</h4>`;
+                amenityString += '<ul>';
+                for (let j = 0; j < property.amenities.categories[i].items.length; j++) {
+                    amenityString += `<li>${property.amenities.categories[i].items[j]}`;
+                }
+                amenityString += '</ul>';
+            }
+            return amenityString;
+        }
+        return amenityString;
+    },
+
     showImages: async function(controller) {
+        set(controller, 'imgCount', 0);
+        set(controller, 'uploadCount', 0);
         set(controller, 'loading', false);
         set(controller, 'showImagePicker', true);
     },
@@ -41,7 +62,8 @@ export default Controller.extend({
             browser.close();
         },
 
-        addAnImage(image, something) {
+        addAnImage(image, controller) {
+            console.log(`Add image (${++this.imgCount}): ${image}`); // eslint-disable-line no-console
             this.imagesToDownload.push(image);
 
             const https = window.requireNode('https');
@@ -124,9 +146,9 @@ export default Controller.extend({
             let q = async.queue(function (task, callback) {
                 downloader(task, callback);
                 // Remove image
-                for (let i = 0; i < something.model.length; i++) {
-                    if (image == something.model[i].src) {
-                        something.model.removeAt(i);
+                for (let i = 0; i < controller.model.length; i++) {
+                    if (image == controller.model[i].src) {
+                        controller.model.removeAt(i);
                     }
                 }
             }, 5);
@@ -146,13 +168,14 @@ export default Controller.extend({
             let page = this.page;
             let browser = this.browser;
             let message = this.message;
+            controller.uploadCount = 0;
 
             if (page) {
 
                 let x = async function (files, page, folder, browser) {
                     // TODO: Add a config entry to determine how many times to attempt to upload an image.
                     let uploadImage = async function(file, page, folder, browser, c) {
-                        // console.log(c);
+                        console.log(`Attempt (${c}) to upload - ${file} (${++controller.uploadCount})`); // eslint-disable-line no-console
                         let myError = null;
                         let input = '';
                         try {
@@ -165,6 +188,7 @@ export default Controller.extend({
                                 await input.uploadFile(folder + file);
                             } catch (e) {
                                 let notifications = controller.get('notifications');
+                                --controller.uploadCount;
                                 notifications.warning(`Retrying to upload image ${file}`, 'Warning', { progressBar: false, timeOut: 3000 });
                                 myError = e;
                             }
@@ -183,7 +207,7 @@ export default Controller.extend({
                         await page.waitFor(1000);
                         
                         controller.set('loading', true);
-                        controller.set('loadingMessage', `Uploading ${files[i]}`);
+                        controller.set('loadingMessage', `Uploading ${files[i]}<br/>(${controller.uploadCount + 1} of ${controller.imagesToDownload.length})`);
                         await uploadImage(files[i], page, folder, browser, 0);
 
                         if (i === files.length - 1) {
@@ -220,6 +244,8 @@ export default Controller.extend({
             f.write(JSON.stringify(contents));
 
             (async () => {
+                let amenities = controller.getAmenities(controller.model.property);
+
                 const browser = await puppeteer.launch({ headless: false });
                 const pages = await browser.pages();
                 const page = await pages[0];
@@ -244,9 +270,11 @@ export default Controller.extend({
                 // });
 
                 // Type into search box.
-                await page.type('input#inputEmailHandle', config.craigslist.emailHandle);
+                // await page.type('input#inputEmailHandle', config.craigslist.emailHandle);
+                await page.$eval('input#inputEmailHandle', (el, value) => el.value = value, config.craigslist.emailHandle);
                 await page.waitFor(250);
-                await page.type('input#inputPassword', config.craigslist.password);
+                // await page.type('input#inputPassword', config.craigslist.password);
+                await page.$eval('input#inputPassword', (el, value) => el.value = value, config.craigslist.password);
                 await page.waitFor(250);
                 await page.click('button.accountform-btn');
 
@@ -293,18 +321,26 @@ export default Controller.extend({
                 // Main page to populate
                 controller.set('loadingMessage', 'Populating form...');
                 await page.waitFor(500);
-                await page.type('#PostingTitle', contents.PostingTitle + contents.postNumber);
-                await page.type('#GeographicArea', contents.GeographicArea);
-                await page.type('#postal_code', contents.postal_code);
-                
-                await page.type('#PostingBody', contents.PostingBody);
-                await page.type("input[name='price']", contents.price);
+                // await page.type('#PostingTitle', contents.PostingTitle + contents.postNumber);
+                await page.$eval('#PostingTitle', (el, value) => el.value = value, contents.PostingTitle + contents.postNumber);
+                // await page.type('#GeographicArea', contents.GeographicArea);
+                await page.$eval('#GeographicArea', (el, value) => el.value = value, `${controller.model.property.address.street}, ${controller.model.property.address.city}, ${controller.model.property.address.state.abbreviation}`);
+                // await page.type('#postal_code', contents.postal_code);
+                // await page.$eval('#postal_code', (el, value) => el.value = value, contents.postal_code);
+                await page.$eval('#postal_code', (el, value) => el.value = value, controller.model.property.address.zip);
+
+                // await page.type('#PostingBody', contents.PostingBody + amenities);
+                await page.$eval('#PostingBody', (el, value) => el.value = value, contents.PostingBody + amenities);
+                // await page.type("input[name='price']", contents.price);
+                await page.$eval("input[name='price']", (el, value) => el.value = value, contents.price);
                 await page.waitFor(500);
                 await page.click("input[name='pets_cat']");
                 await page.click("input[name='pets_dog']");
                 await page.click("input[value='A']");
-                await page.type("input[name='contact_name']", contents.contact_name);
-                await page.type("input[name='contact_phone']", contents.contact_phone);
+                // await page.type("input[name='contact_name']", contents.contact_name);
+                await page.$eval("input[name='contact_name']", (el, value) => el.value = value, contents.contact_name);
+                // await page.type("input[name='contact_phone']", contents.contact_phone);
+                await page.$eval("input[name='contact_phone']", (el, value) => el.value = value, contents.contact_phone);
                 await page.waitFor(500);
 
                 await page.click("button[name='go']");
