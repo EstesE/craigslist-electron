@@ -199,6 +199,7 @@ export default Controller.extend({
                             notifications.warning(`Warning - ${file}`, e, { progressBar: false, timeOut: 5000 });
                             myError = e;
                         }
+                        await page.waitFor(1000);
                         if (isPresent(myError)) {
                             await uploadImage(file, page, folder, browser, c);
                         }
@@ -212,6 +213,7 @@ export default Controller.extend({
                         await uploadImage(files[i], page, folder, browser, 0);
 
                         if (i === files.length - 1) {
+                            await page.waitFor(1500);
                             controller.set('loadingMessage', 'Finishing up posting process...');
                             await page.waitForSelector(".bigbutton");
                             await page.click(".bigbutton");
@@ -334,14 +336,17 @@ export default Controller.extend({
                 await page.$eval("input[name='contact_name']", (el, value) => el.value = value, contents.contact_name);
                 await page.$eval("input[name='contact_phone']", (el, value) => el.value = value, contents.contact_phone);
                 await page.click("button[name='go']");
+                await page.waitFor(500);
 
                 // Cross street page
                 await page.waitForSelector('.continue');
+                await page.$eval('#xstreet0', (el, value) => el.value = value, controller.model.property.address.street);
                 await page.click('.continue');
 
                 // Images page
                 controller.set('loadingMessage', 'Getting images ready...');
                 await page.waitForSelector('#classic');
+                await page.waitFor(500);
                 await page.click('#classic');
                 await page.waitForSelector("input[name='file']");
 
