@@ -55,13 +55,6 @@ export default Controller.extend({
     },
 
     actions: {
-        navigate(loc) {
-            this.set('ourChanges', null);
-            this.set('location', loc);
-            let browser = this.browser;
-            browser.close();
-        },
-
         addAnImage(image, controller) {
             console.log(`Add image (${++this.imgCount}): ${image}`); // eslint-disable-line no-console
 
