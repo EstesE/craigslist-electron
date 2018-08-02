@@ -54,11 +54,11 @@ export default Route.extend({
                 }
             });
             
-            // console.log(ourLocations.sortBy('region', 0));
             controller.set('model', {
                 locations: ourLocations.sortBy('region', 0),
-                properties: model.property,
-                property: model.properties[Math.floor(Math.random() * model.properties.length)]
+                properties: model.properties,
+                property: null
+                // property: model.properties[Math.floor(Math.random() * model.properties.length)]
             });
         }
     }
