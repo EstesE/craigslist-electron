@@ -8,15 +8,17 @@ module.exports = function(environment) {
     locationType: 'auto',
 
     web: {
-      
+
     },
 
+    closeBrowser: true,
+
     craigslist: {
-      
+
     },
 
     asset: {
-      
+
     },
 
     // Path to save downloaded images to.
