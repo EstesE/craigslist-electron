@@ -1,0 +1,10 @@
+{{#power-select
+  options=model
+  searchField=searchField
+  onchange=(action launch)
+  as |x|
+}}
+  {{x.country}} - {{x.region}} - {{x.name}}
+{{/power-select}}
+
+{{yield}}
