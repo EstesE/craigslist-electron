@@ -1,10 +1,11 @@
 {{#power-select
-  options=model
+  selected=property
+  options=properties
   searchField=searchField
-  onchange=(action launch)
-  as |x|
+  onchange=(action 'test')
+  as |property|
 }}
-  {{x.country}} - {{x.region}} - {{x.name}}
+  {{property.name}} - ({{property.address.state.abbreviation}} {{property.address.city}})
 {{/power-select}}
 
 {{yield}}
