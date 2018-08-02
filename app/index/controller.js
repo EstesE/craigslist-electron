@@ -229,7 +229,7 @@ export default Controller.extend({
             }
         },
 
-        test(loc) {
+        launch(loc) {
             let controller = this;
             controller.set('ourChanges', null);
             this.set('location', loc);
