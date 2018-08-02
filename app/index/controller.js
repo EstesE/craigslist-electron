@@ -65,7 +65,6 @@ export default Controller.extend({
     actions: {
         setProperty(property) {
             this.set('property', property);
-            let model = this.get('model');
             this.set('model.property', property);
         },
 
