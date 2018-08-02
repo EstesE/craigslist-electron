@@ -37,7 +37,7 @@ export default Route.extend({
             return {
                 craigslistLocations: array[0].value,
                 states: array[1].value,
-                property: array[2].value
+                properties: array[2].value
             };
         }, function(error) {
             let notifications = this.get('notifications');
@@ -57,7 +57,8 @@ export default Route.extend({
             // console.log(ourLocations.sortBy('region', 0));
             controller.set('model', {
                 locations: ourLocations.sortBy('region', 0),
-                property: model.property[Math.floor(Math.random() * model.property.length)]
+                properties: model.property,
+                property: model.properties[Math.floor(Math.random() * model.properties.length)]
             });
         }
     }
