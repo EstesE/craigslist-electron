@@ -213,7 +213,7 @@ export default Controller.extend({
                         await uploadImage(files[i], page, folder, browser, 0);
 
                         if (i === files.length - 1) {
-                            await page.waitFor(1500);
+                            await page.waitFor(2000);
                             controller.set('loadingMessage', 'Finishing up posting process...');
                             await page.waitForSelector(".bigbutton");
                             await page.click(".bigbutton");
