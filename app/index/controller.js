@@ -62,10 +62,15 @@ export default Controller.extend({
         set(controller, 'showImagePicker', true);
     },
 
+    clearLocation() {
+        this.set('location', null);
+    },
+
     actions: {
         setProperty(property) {
             this.set('property', property);
             this.set('model.property', property);
+            this.clearLocation();
         },
 
         addAnImage(image, controller) {
@@ -340,6 +345,7 @@ export default Controller.extend({
                 await page.click("input[name='pets_cat']");
                 await page.click("input[name='pets_dog']");
                 await page.click("input[value='A']");
+                await page.waitFor(500);
                 await page.$eval("input[name='contact_name']", (el, value) => el.value = value, contents.contact_name);
                 await page.$eval("input[name='contact_phone']", (el, value) => el.value = value, contents.contact_phone);
                 await page.click("button[name='go']");
