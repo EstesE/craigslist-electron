@@ -21,14 +21,22 @@ export default Controller.extend({
     imgCount: 0,
     addImageCount: 0,
     uploadCount: 0,
+    property: null,
+    pageToVisit: '',
 
-    message: async function (title, message, controller) {
+    message: async function (title, message, controller, browser) {
         let notifications = controller.get('notifications');
         notifications.success(title, message, { progressBar: false, timeOut: 5000 });
         set(controller, 'showImagePicker', false);
         set(controller, 'imagesToDownload', []);
         controller.set('loading', false);
-        controller.transitionToRoute('finished', controller.model.property.name);
+
+        if (config.closeBrowser === true) {
+            browser.close();
+        }
+        
+        let name = controller.model.property.name;
+        controller.transitionToRoute('finished', { name: name, location: controller.location, pageToVisit: controller.pageToVisit });
     },
 
     getAmenities: function(property) {
@@ -55,6 +63,12 @@ export default Controller.extend({
     },
 
     actions: {
+        setProperty(property) {
+            this.set('property', property);
+            let model = this.get('model');
+            this.set('model.property', property);
+        },
+
         addAnImage(image, controller) {
             console.log(`Add image (${++this.imgCount}): ${image}`); // eslint-disable-line no-console
 
@@ -211,10 +225,11 @@ export default Controller.extend({
                             await page.waitForSelector(".bigbutton");
                             await page.click(".bigbutton");
                             await page.waitForSelector('button[value="Continue"]');
+                            controller.set('pageToVisit', page._target._targetInfo.title);
                             await page.click('button[value="Continue"]');
 
                             controller.set('loadingMessage', 'Finalizing...');
-                            await message(`Ad placed for ${controller.model.property.name}`, 'Success', controller);
+                            await message(`Ad placed for ${controller.model.property.name}`, 'Success', controller, browser);
                         }
                     }
                 };
