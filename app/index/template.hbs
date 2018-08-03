@@ -1,25 +1,23 @@
 {{#unless loading}}
     <div class="container">
         <label>Select Property</label>
-        {{property-selector class="form-control" property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty')}} 
+        {{property-selector property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty')}} 
     </div>
 
     {{#if model.property}}
     <div class="container">
         <label>Select Area</label>
-        {{location-selector class="form-control" location=location locations=model.locations searchField='name' launch=(action 'launch')}} 
+        {{location-selector location=location locations=model.locations searchField='name' launch=(action 'launch')}} 
     </div>
     {{/if}}
 {{/unless}}
 
 {{#if loading}}
     {{loading-mask loadingMessage=loadingMessage}}
-{{/if}}
-
-{{#unless loading}}
+{{else}}
     {{#if showImagePicker}}
         {{image-picker model=model.property.gallery onSave=(action 'onSave') addAnImage=(action 'addAnImage')}}
     {{/if}}
-{{/unless}}
+{{/if}}
 
 {{outlet}}
