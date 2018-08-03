@@ -1,11 +1,12 @@
 {{#power-select
   selected=location
   options=locations
+  disabled=disableLocationSelector
   searchField=searchField
   onchange=(action launch)
   as |x|
 }}
-  {{x.country}} - {{x.region}} - {{x.name}}
+  {{x.country}} - {{x.region}} - {{x.name}} {{#if getDistances}}(≈ {{x.distance}}){{/if}}
 {{/power-select}}
 
 {{yield}}
