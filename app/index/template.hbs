@@ -7,7 +7,7 @@
     {{#if model.property}}
     <div class="container">
         <label>Select Area</label>
-        {{location-selector location=location locations=model.refinedLocations searchField='name' launch=(action 'launch')}} 
+        {{location-selector disableLocationSelector=disableLocationSelector getDistances=getDistances location=location locations=model.refinedLocations searchField='name' launch=(action 'launch')}} 
     </div>
     {{/if}}
 {{/unless}}
