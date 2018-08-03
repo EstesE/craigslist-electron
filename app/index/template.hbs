@@ -1,13 +1,13 @@
 {{#unless loading}}
     <div class="container">
         <label>Select Property</label>
-        {{property-selector property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty')}} 
+        {{property-selector property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty') updateLocations=(action 'updateLocations')}} 
     </div>
 
     {{#if model.property}}
     <div class="container">
         <label>Select Area</label>
-        {{location-selector location=location locations=model.locations searchField='name' launch=(action 'launch')}} 
+        {{location-selector location=location locations=model.refinedLocations searchField='name' launch=(action 'launch')}} 
     </div>
     {{/if}}
 {{/unless}}
