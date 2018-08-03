@@ -12,6 +12,7 @@ module.exports = function(environment) {
     },
 
     closeBrowser: true,
+    limitAreaToPropertyState: true,
 
     craigslist: {
 
