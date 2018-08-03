@@ -56,6 +56,7 @@ export default Route.extend({
             
             controller.set('model', {
                 locations: ourLocations.sortBy('region', 0),
+                refinedLocations: ourLocations.sortBy('region', 0),
                 properties: model.properties,
                 property: null
                 // property: model.properties[Math.floor(Math.random() * model.properties.length)]
