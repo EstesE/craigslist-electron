@@ -31,7 +31,7 @@ export default Controller.extend({
         set(controller, 'imagesToDownload', []);
         controller.set('loading', false);
 
-        if (config.closeBrowser === true) {
+        if (config.closeBrowserWhenFinished === true) {
             browser.close();
         }
         

@@ -11,7 +11,7 @@ module.exports = function(environment) {
 
     },
 
-    closeBrowser: true,
+    closeBrowserWhenFinished: true,
     limitAreaToPropertyState: true,
 
     craigslist: {
