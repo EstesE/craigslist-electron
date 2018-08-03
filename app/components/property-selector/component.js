@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import config from 'craigslist-electron/config/environment';
 
 export default Component.extend({
     init() {
@@ -9,6 +10,10 @@ export default Component.extend({
         test(property) {
             this.set('property', property);
             this.setProperty(property);
+
+            if (config.limitAreaToPropertyState) {
+                this.updateLocations(property.address.state.abbreviation);
+            }         
         }
     }
 });
