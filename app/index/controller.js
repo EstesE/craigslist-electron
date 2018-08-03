@@ -67,6 +67,18 @@ export default Controller.extend({
     },
 
     actions: {
+        updateLocations(state) {
+            let controller = this;
+            let locations = controller.model.locations;
+            let updatedLocations = [];
+            locations.map((loc) => {
+                if (loc.region === state) {
+                    updatedLocations.push(loc);
+                }
+            });
+            controller.set('model.refinedLocations', updatedLocations);
+        },
+
         setProperty(property) {
             this.set('property', property);
             this.set('model.property', property);
