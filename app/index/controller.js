@@ -6,9 +6,11 @@ import { set } from '@ember/object';
 import { A } from '@ember/array';
 import { isPresent } from '@ember/utils';
 import $ from 'jquery';
+import { allSettled } from 'rsvp';
 // import { retry } from 'rxjs/operator/retry';
 
 export default Controller.extend({
+    googleRepo: inject('google-repository'),
     notifications: inject('toast'),
     location: null,
     ourChanges: null,
@@ -23,6 +25,8 @@ export default Controller.extend({
     uploadCount: 0,
     property: null,
     pageToVisit: '',
+    getDistances: config.getDistances,
+    disableLocationSelector: true,
 
     message: async function (title, message, controller, browser) {
         let notifications = controller.get('notifications');
@@ -68,21 +72,48 @@ export default Controller.extend({
 
     actions: {
         updateLocations(state) {
+            console.log('updated locations');
             let controller = this;
             let locations = controller.model.locations;
             let updatedLocations = [];
+            let distancePromises = [];
+            let property = controller.model.property;
             locations.map((loc) => {
                 if (loc.region === state) {
                     updatedLocations.push(loc);
+                    if (controller.getDistances) {
+                        let promise = controller.get('googleRepo').find({
+                        property, loc}).then(r => {
+                            return r.rows[0].elements[0].distance.text;
+                        }).catch(e => {
+                            debugger;
+                        });
+                        distancePromises.push(promise);
+                    }
                 }
             });
-            controller.set('model.refinedLocations', updatedLocations);
+
+            if (controller.getDistances) {
+                allSettled(distancePromises).then(function(array) {
+                    for (let i = 0; i < updatedLocations.length; i++) {
+                        updatedLocations[i].distance = array[i].value;
+                    }
+                    controller.set('disableLocationSelector', false);
+                    controller.set('model.refinedLocations', updatedLocations);
+                }, function(error) {
+                    debugger;
+                });
+            } else {
+                controller.set('model.refinedLocations', updatedLocations);
+                this.disableLocationSelector = false;
+            }
         },
 
         setProperty(property) {
             this.set('property', property);
             this.set('model.property', property);
             this.clearLocation();
+            this.set('disableLocationSelector', true);
         },
 
         addAnImage(image, controller) {
