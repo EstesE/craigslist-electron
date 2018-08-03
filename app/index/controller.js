@@ -397,6 +397,10 @@ export default Controller.extend({
                 // Cross street page
                 await page.waitForSelector('.continue');
                 await page.$eval('#xstreet0', (el, value) => el.value = value, controller.model.property.address.street);
+                await page.waitFor(500);
+                await page.waitForSelector('#search_button');
+                await page.click('#search_button');
+                await page.waitFor(500);
                 await page.click('.continue');
 
                 // Images page
