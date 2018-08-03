@@ -13,6 +13,7 @@ module.exports = function(environment) {
 
     closeBrowserWhenFinished: true,
     limitAreaToPropertyState: true,
+    getDistances: true,
 
     craigslist: {
 
