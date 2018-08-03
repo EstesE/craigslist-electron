@@ -84,7 +84,11 @@ export default Controller.extend({
                     if (controller.getDistances) {
                         let promise = controller.get('googleRepo').find({
                         property, loc}).then(r => {
-                            return r.rows[0].elements[0].distance.text;
+                            if (r.rows[0].elements[0].status === 'OK') {
+                                return r.rows[0].elements[0].distance.text;
+                            } else {
+                                return '';
+                            }
                         }).catch(e => {
                             debugger;
                         });
