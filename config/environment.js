@@ -8,19 +8,19 @@ module.exports = function(environment) {
     locationType: 'auto',
 
     web: {
-
+      
     },
 
     closeBrowserWhenFinished: true,
     limitAreaToPropertyState: true,
-    getDistances: true,
+    getDistances: false, // Quota issues...
 
     craigslist: {
-
+      
     },
 
     asset: {
-
+      
     },
 
     // Path to save downloaded images to.

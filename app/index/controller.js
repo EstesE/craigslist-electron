@@ -78,24 +78,28 @@ export default Controller.extend({
             let updatedLocations = [];
             let distancePromises = [];
             let property = controller.model.property;
-            locations.map((loc) => {
-                if (loc.region === state) {
-                    updatedLocations.push(loc);
-                    if (controller.getDistances) {
-                        let promise = controller.get('googleRepo').find({
-                        property, loc}).then(r => {
-                            if (r.rows[0].elements[0].status === 'OK') {
-                                return r.rows[0].elements[0].distance.text;
-                            } else {
-                                return '';
-                            }
-                        }).catch(e => {
-                            debugger;
-                        });
-                        distancePromises.push(promise);
+            if (state) {
+                locations.map((loc) => {
+                    if (loc.region === state) {
+                        updatedLocations.push(loc);
+                        if (controller.getDistances) {
+                            let promise = controller.get('googleRepo').find({
+                            property, loc}).then(r => {
+                                if (r.rows[0].elements[0].status === 'OK') {
+                                    return r.rows[0].elements[0].distance.text;
+                                } else {
+                                    return '';
+                                }
+                            }).catch(e => {
+                                debugger;
+                            });
+                            distancePromises.push(promise);
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                updatedLocations = locations;
+            }
 
             if (controller.getDistances) {
                 allSettled(distancePromises).then(function(array) {
@@ -109,7 +113,7 @@ export default Controller.extend({
                 });
             } else {
                 controller.set('model.refinedLocations', updatedLocations);
-                this.disableLocationSelector = false;
+                controller.set('disableLocationSelector', false);
             }
         },
 

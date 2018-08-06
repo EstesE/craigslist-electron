@@ -13,7 +13,9 @@ export default Component.extend({
 
             if (config.limitAreaToPropertyState) {
                 this.updateLocations(property.address.state.abbreviation);
-            }         
+            } else {
+                this.updateLocations();
+            }
         }
     }
 });
