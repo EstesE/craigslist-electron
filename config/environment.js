@@ -11,16 +11,17 @@ module.exports = function(environment) {
       
     },
 
+    headless: true,
     closeBrowserWhenFinished: true,
     limitAreaToPropertyState: true,
     getDistances: false, // Quota issues...
 
     craigslist: {
-      
+
     },
 
     asset: {
-      
+
     },
 
     // Path to save downloaded images to.

@@ -1,0 +1,10 @@
+<div class="container text-center">
+{{#if additionalSelection}}
+<h4>Additional Selection</h4>
+{{/if}}
+{{#each additionalSelection as |selection|}}
+    {{!-- <div>{{my-selection selection=selection click=(action 'select' value="target.value")}}</div> --}}
+    {{my-selection selection=selection click=(action 'select' value='target')}}
+{{/each}}
+{{yield}}
+</div>

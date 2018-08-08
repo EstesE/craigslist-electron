@@ -1,15 +1,17 @@
 {{#unless loading}}
-    <div class="container">
-        <label>Select Property</label>
-        {{property-selector property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty') updateLocations=(action 'updateLocations')}} 
-    </div>
+    {{#unless additionalSelection}}
+        <div class="container">
+            <label>Select Property</label>
+            {{property-selector property=model.property properties=model.properties searchField='name' setProperty=(action 'setProperty') updateLocations=(action 'updateLocations')}} 
+        </div>
 
-    {{#if model.property}}
-    <div class="container">
-        <label>Select Area</label>
-        {{location-selector disableLocationSelector=disableLocationSelector getDistances=getDistances location=location locations=model.refinedLocations searchField='name' launch=(action 'launch')}} 
-    </div>
-    {{/if}}
+        {{#if model.property}}
+        <div class="container">
+            <label>Select Area</label>
+            {{location-selector disableLocationSelector=disableLocationSelector getDistances=getDistances location=location locations=model.refinedLocations searchField='name' launch=(action 'launch')}} 
+        </div>
+        {{/if}}
+    {{/unless}}
 {{/unless}}
 
 {{#if loading}}
@@ -19,5 +21,14 @@
         {{image-picker model=model.property.gallery onSave=(action 'onSave') addAnImage=(action 'addAnImage')}}
     {{/if}}
 {{/if}}
+
+{{additional-navigation
+    additionalSelection=additionalSelection
+    continueLaunch=(action 'continueLaunch')
+    page=page
+    browser=browser
+    contents=contents
+}}
+
 
 {{outlet}}

@@ -27,6 +27,8 @@ export default Controller.extend({
     pageToVisit: '',
     getDistances: config.getDistances,
     disableLocationSelector: true,
+    additionalSelection: null,
+    contents: null,
 
     message: async function (title, message, controller, browser) {
         let notifications = controller.get('notifications');
@@ -85,9 +87,10 @@ export default Controller.extend({
                         if (controller.getDistances) {
                             let promise = controller.get('googleRepo').find({
                             property, loc}).then(r => {
-                                if (r.rows[0].elements[0].status === 'OK') {
+                                if (r.status === 'OK' && r.rows[0].elements[0].status === 'OK') {
                                     return r.rows[0].elements[0].distance.text;
                                 } else {
+                                    console.log(r.status);
                                     return '';
                                 }
                             }).catch(e => {
@@ -306,6 +309,8 @@ export default Controller.extend({
             let contents = fs.readFileSync(path.resolve() + '/ember-electron/resources/post.json');
             contents = JSON.parse(contents);
             contents.postNumber = parseInt(contents.postNumber) + 1;
+            // debugger;
+            controller.set('contents', contents);
             let f = fs.createWriteStream(path.resolve() + '/ember-electron/resources/post.json');
             f.write(JSON.stringify(contents));
 
@@ -313,7 +318,7 @@ export default Controller.extend({
                 let amenities = controller.getAmenities(controller.model.property);
                 let junk = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum sed arcu non odio. Ipsum consequat nisl vel pretium lectus. Sagittis vitae et leo duis. Sit amet nulla facilisi morbi tempus iaculis. Nisi est sit amet facilisis magna etiam. Aenean vel elit scelerisque mauris. Proin nibh nisl condimentum id venenatis a condimentum. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. Interdum posuere lorem ipsum dolor sit amet consectetur.</p><p>Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Sit amet aliquam id diam maecenas ultricies mi. Id venenatis a condimentum vitae. Habitant morbi tristique senectus et. Pellentesque elit ullamcorper dignissim cras. Malesuada proin libero nunc consequat interdum. Urna porttitor rhoncus dolor purus non. Feugiat in ante metus dictum at tempor. Faucibus purus in massa tempor nec feugiat nisl pretium. Nibh tellus molestie nunc non blandit massa enim nec dui. Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Pellentesque adipiscing commodo elit at imperdiet. Consequat semper viverra nam libero justo laoreet sit.</p>"
 
-                const browser = await puppeteer.launch({ headless: false });
+                const browser = await puppeteer.launch({ headless: config.headless });
                 const pages = await browser.pages();
                 const page = await pages[0];
 
@@ -352,22 +357,129 @@ export default Controller.extend({
                     browser.close();
                 }
 
-                // More navigation
+                // More navigation - Places like Atlanta Georgia are a problem
                 // await page.waitFor(1000);
                 try {
                     await page.waitForSelector('input[value="ho"]', { timeout: 5000 });
                 } catch(e) {
-                    let notifications = controller.get('notifications');
-                    notifications.error(e, 'Error', { progressBar: false, timeOut: 10000 });
-                    browser.close();
-                    // TODO: Handle places like Hawaii that need additional navigation
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 10000);
+                    // TODO: Clean this up.
+                    // .selection-list // More choices???
+                    let selectionList = await page.evaluate(() => {
+                        return document.querySelector('.selection-list').innerHTML;
+                    });
+
+                    let ourSelection = selectionList.split('</label></li>');
+                    let x = $(selectionList.trim());
+                    let elems = [];
+                    let y = x.map((i,e) => {
+                        if (typeof(e.innerText) !== 'undefined') {
+                            let text = e.innerText;
+                            let value = $('input', e)[0].value;
+                            let name = $('input', e)[0].name;
+                            elems.push(`<div class='pointer p5' name=${name} value=${value}><input class='hidden' type='radio' name=${name} value=${value}>${text}</div>`);
+                        }
+                    });
+                    
+                    controller.set('additionalSelection', elems);     
+                    controller.set('loading', false);
+                    return; // END OF THE LINE
                 }
+
                 await page.evaluate(() => {
                     document.querySelector('input[value="ho"]').click();
                     document.querySelector('button[value="Continue"]').click();
+                });
+
+                await page.waitFor(1000);
+                try {
+                    await page.goto(page._target._targetInfo.url.replace('type', 'hcat'), { awaitUntil: 'networkidle2' });
+                } catch(e) {
+                    console.error(e); // eslint-disable-line no-console
+                    browser.close();
+                }
+
+                // More navigation
+                await page.waitFor(500);
+                await page.evaluate(() => {
+                    document.querySelector('input[value="1"]').click();
+                    document.querySelector('button[value="Continue"]').click();
+                });
+
+                // Populate form
+                controller.set('loadingMessage', 'Populating form...');
+                await page.waitForSelector('#PostingTitle');
+                await page.$eval('#PostingTitle', (el, value) => el.value = value, contents.PostingTitle + contents.postNumber);
+                await page.$eval('#GeographicArea', (el, value) => el.value = value, `${controller.model.property.address.street}, ${controller.model.property.address.city}, ${controller.model.property.address.state.abbreviation}`);
+                await page.$eval('#postal_code', (el, value) => el.value = value, controller.model.property.address.zip);
+                await page.$eval('#PostingBody', (el, value) => el.value = value, contents.PostingBody + junk + amenities);
+                await page.$eval("input[name='price']", (el, value) => el.value = value, contents.price);
+                await page.click("input[name='pets_cat']");
+                await page.click("input[name='pets_dog']");
+                await page.click("input[value='A']");
+                await page.waitFor(500);
+                await page.$eval("input[name='contact_name']", (el, value) => el.value = value, contents.contact_name);
+                await page.$eval("input[name='contact_phone']", (el, value) => el.value = value, contents.contact_phone);
+                await page.click("button[name='go']");
+                await page.waitFor(500);
+
+                // Cross street page
+                await page.waitForSelector('.continue');
+                await page.$eval('#xstreet0', (el, value) => el.value = value, controller.model.property.address.street);
+                await page.waitFor(500);
+                await page.waitForSelector('#search_button');
+                await page.click('#search_button');
+                await page.waitFor(500);
+                await page.click('.continue');
+
+                // Images page
+                controller.set('loadingMessage', 'Getting images ready...');
+                await page.waitForSelector('#classic');
+                await page.waitFor(500);
+                await page.click('#classic');
+                await page.waitForSelector("input[name='file']");
+
+                // Images section
+                await this.showImages(controller);
+            })();
+        },
+
+        continueLaunch(contents, page,browser, val) {
+            // debugger;
+
+            (async () => {
+                let junk = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum sed arcu non odio. Ipsum consequat nisl vel pretium lectus. Sagittis vitae et leo duis. Sit amet nulla facilisi morbi tempus iaculis. Nisi est sit amet facilisis magna etiam. Aenean vel elit scelerisque mauris. Proin nibh nisl condimentum id venenatis a condimentum. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. Interdum posuere lorem ipsum dolor sit amet consectetur.</p><p>Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Sit amet aliquam id diam maecenas ultricies mi. Id venenatis a condimentum vitae. Habitant morbi tristique senectus et. Pellentesque elit ullamcorper dignissim cras. Malesuada proin libero nunc consequat interdum. Urna porttitor rhoncus dolor purus non. Feugiat in ante metus dictum at tempor. Faucibus purus in massa tempor nec feugiat nisl pretium. Nibh tellus molestie nunc non blandit massa enim nec dui. Vitae sapien pellentesque habitant morbi tristique senectus et netus et. Pellentesque adipiscing commodo elit at imperdiet. Consequat semper viverra nam libero justo laoreet sit.</p>"
+                // let str = `input[value="${val}"]`;
+                let controller = this;
+                let amenities = controller.getAmenities(controller.model.property);
+                controller.set('additionalSelection', null);
+                controller.set('loading', true);
+                controller.set('loadingMessage', 'additional navigation...');
+
+                // debugger;
+                // await page.evaluate(function(x, this){
+                //     function evaluate(p, func) {
+                //         var args = [].slice.call(arguments, 2);
+                //         var fn = "function() { return (" + func.toString() + ").apply(this, " + JSON.stringify(args) + ");}";
+                //         return p.evaluate(fn);
+                //     }
+
+                //     evaluate(page, function(x) {
+                //         console.log(x);
+                //     }, x)
+                // });
+
+                await page.click(`input[value="${val}"]`);
+                await page.waitFor(1500);
+                
+                await page.evaluate(() => {
+                    document.querySelector('input[value="ho"]').click();
+                    document.querySelector('button[value="Continue"]').click();
+                });
+
+                await page.waitFor(1500);
+                await page.evaluate(() => {
+                    document.querySelector('input[value="1"]').click();
+                    // document.querySelector('button[value="Continue"]').click();
                 });
 
                 await page.waitFor(1000);
